@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package proto;
+
+message RegisterWorkerRequest {
+    string ip = 1;
+    int32 port = 2;
+    string secret = 3;
+}
+
+message RegisterWorkerResponse {
+    int32 worker_id = 1;
+}
+
+message FinishExtractingLinksRequest {
+    int32 worker_id = 1;
+    repeated string links = 2;
+}
+
+message ExploreWebsiteRequest {
+    string url = 1;
+}
+
+service Master {
+    rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse) {}
+    rpc FinishExtractingLinks(FinishExtractingLinksRequest) returns (google.protobuf.Empty) {}
+    rpc ExploreWebsite(ExploreWebsiteRequest) returns (google.protobuf.Empty) {}
+}

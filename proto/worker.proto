@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package proto;
+
+message StartExtractingLinksRequest {
+    string secret = 1;
+    string url = 2;
+}
+
+service Worker {
+    rpc StartExtractingLinks(StartExtractingLinksRequest) returns (google.protobuf.Empty) {}
+}
