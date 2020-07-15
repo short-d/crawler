@@ -1,5 +1,5 @@
 # Crawler
-Explore the web in parallel on thoudsands of machines
+Explore the web in parallel on thousands of machines
 
 ## Getting Started
 
