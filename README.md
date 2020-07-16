@@ -1,6 +1,19 @@
 # Crawler
 Explore the web in parallel on thoudsands of machines
 
+## TODO
+
+- [ ] Health check for workers & master
+- [ ] Abstract out worker scheduling to support custom algorithms
+- [ ] Assign job to new worker when previously assigned worker failed
+- [ ] Support checkpoint for master
+- [ ] Auto recover system when the master is back online
+- [ ] Support pluggable worker script
+- [ ] Load worker script from network file system
+- [ ] TLS
+- [ ] Support Docker Swam
+- [ ] Support k8s
+
 ## Getting Started
 
 ```bash
