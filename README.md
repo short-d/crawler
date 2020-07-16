@@ -3,6 +3,9 @@ Explore the web in parallel on thousands of machines
 
 ## TODO
 
+- [ ] Productionize master & worker with [app] framework
+- [ ] Configure continuous delivery to bootstrap productivity
+- [ ] Create CLI to trigger crawling for a certain site
 - [ ] Health check for workers & master
 - [ ] Abstract out worker scheduling to support custom algorithms
 - [ ] Assign job to new worker when previously assigned worker failed
