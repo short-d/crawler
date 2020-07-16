@@ -13,18 +13,19 @@ type Master struct {
 }
 
 func (m *Master) ExploreWebsite(ctx context.Context, siteURL string) {
+	done := ctx.Done()
+
+	// Prevent channel from blocking on the with the initial site URL
+	m.linksCh = make(chan []string, 1)
+	linkCh := make(chan string)
 	visited := make(map[string]bool)
 
-	m.linksCh = make(chan []string, 1)
 	m.linksCh <- []string{siteURL}
 	count := 1
-
-	done := ctx.Done()
 
 	for {
 		select {
 		case links := <-m.linksCh:
-
 			if len(links) > 0 {
 				fmt.Printf("%s\n", strings.Join(links, "\n"))
 			}
@@ -36,17 +37,22 @@ func (m *Master) ExploreWebsite(ctx context.Context, siteURL string) {
 				count++
 				visited[link] = true
 				go func(link string) {
-					worker := <-m.idleWorkers
-					err := worker.FetchLinks(ctx, link)
-					if err != nil {
-						m.idleWorkers <- worker
-					}
+					linkCh <- link
 				}(link)
 			}
 			if count == 0 {
 				fmt.Printf("Finish exploring %s\n", siteURL)
 				return
 			}
+		case link := <-linkCh:
+			go func(link string) {
+				// process the current site there is idle worker
+				worker := <-m.idleWorkers
+				err := worker.FetchLinks(ctx, link)
+				if err != nil {
+					m.idleWorkers <- worker
+				}
+			}(link)
 		case <-done:
 			return
 		}
