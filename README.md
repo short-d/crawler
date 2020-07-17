@@ -3,7 +3,7 @@ Explore the web in parallel on thousands of machines
 
 ## TODO
 
-- [ ] Productionize master & worker with [app] framework
+- [ ] Productionize master & worker with [app](https://api.short-d.com/r/fw) framework
 - [ ] Configure continuous delivery to bootstrap productivity
 - [ ] Create CLI to trigger crawling for a certain site
 - [ ] Health check for workers & master
