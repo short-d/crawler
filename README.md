@@ -1,4 +1,4 @@
-# Crawler
+# Distributed Crawler
 Explore the web in parallel on thousands of machines
 
 ## TODO
