@@ -7,6 +7,7 @@ import (
 	"net"
 
 	"github.com/golang/protobuf/ptypes/empty"
+    "github.com/short-d/app/fw/service"
 	"google.golang.org/grpc"
 )
 
@@ -54,4 +55,18 @@ func (s Server) Start(port int) error {
 
 func NewServer() Server {
 	return Server{master: newMaster()}
+}
+
+func main() {
+    gRPCService, err := service.
+            NewGRPCBuilder("Master").
+            RegisterHandler(func(server *grpc.NewServer) {
+                    sv := grpc.Server{}
+                    proto.RegisterMasterServer(server, sv)
+            }).
+            Build()
+    if err != nil {
+        panic(err)
+    }
+    gRPCService.StartAndWait(8080)
 }
