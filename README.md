@@ -5,7 +5,6 @@ Explore the web in parallel on thousands of machines
 
 - [ ] Productionize master & worker with [app](https://api.short-d.com/r/fw) framework
 - [ ] Configure continuous delivery to bootstrap productivity
-- [ ] Create CLI to trigger crawling for a certain site
 - [ ] Health check for workers & master
 - [ ] Abstract out worker scheduling to support custom algorithms
 - [ ] Assign job to new worker when previously assigned worker failed
@@ -13,7 +12,8 @@ Explore the web in parallel on thousands of machines
 - [ ] Auto recover system when the master is back online
 - [ ] Support pluggable worker script
 - [ ] Load worker script from network file system
-- [ ] TLS
+- [ ] TLS (Transport Layer Security)
+- [ ] Create CLI to trigger crawling for a certain site
 - [ ] Support Docker Swam
 - [ ] Support k8s
 
