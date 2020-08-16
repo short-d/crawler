@@ -129,6 +129,7 @@ Start extracting links from /terms/
 ## Author
 
 - **Yang Liu** - *Initial work* - [byliuyang](https://github.com/byliuyang)
+- **Vinod Krishnan** - *Incremental improvements* - [vtkrishn](https://github.com/vtkrishn)
 
 ## License
 This project is maintained under MIT license.
