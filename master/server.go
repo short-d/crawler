@@ -4,9 +4,9 @@ import (
 	"context"
 	"crawler/proto"
 	"fmt"
-	"net"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/short-d/app/fw/service"
 	"google.golang.org/grpc"
 )
 
@@ -41,15 +41,19 @@ func (s Server) FinishExtractingLinks(ctx context.Context, request *proto.Finish
 }
 
 func (s Server) Start(port int) error {
-	address := fmt.Sprintf(":%d", port)
-	lis, err := net.Listen("tcp", address)
+	gRPCService, err := service.
+		NewGRPCBuilder("Master").
+		RegisterHandler(func(server *grpc.Server) {
+			proto.RegisterMasterServer(server, &s)
+		}).
+		Build()
 	if err != nil {
-		return err
+		panic(err)
 	}
-	sv := grpc.NewServer()
-	proto.RegisterMasterServer(sv, &s)
+
 	fmt.Printf("Master started at %d\n", port)
-	return sv.Serve(lis)
+	gRPCService.StartAndWait(port)
+	return nil
 }
 
 func NewServer() Server {
