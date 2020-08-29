@@ -8,13 +8,15 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Master struct {
+// MasterClient to connect to master server
+type MasterClient struct {
 	masterIP   string
 	masterPort int
 	client     proto.MasterClient
 }
 
-func (m Master) FinishExtractingLinks(workerID int, links []string) error {
+// FinishExtractingLinks makes a grpc request to inform Finishing extracting links by this worker
+func (m MasterClient) FinishExtractingLinks(workerID int, links []string) error {
 	req := proto.FinishExtractingLinksRequest{
 		WorkerId: int32(workerID),
 		Links:    links,
@@ -23,7 +25,8 @@ func (m Master) FinishExtractingLinks(workerID int, links []string) error {
 	return err
 }
 
-func (m Master) RegisterWorker(workerIP string, workerPort int, secret string) (int, error) {
+// RegisterWorker makes a grpc call to register the new worker to master
+func (m MasterClient) RegisterWorker(workerIP string, workerPort int, secret string) (int, error) {
 	req := proto.RegisterWorkerRequest{
 		Ip:     workerIP,
 		Port:   int32(workerPort),
@@ -36,7 +39,8 @@ func (m Master) RegisterWorker(workerIP string, workerPort int, secret string) (
 	return int(res.WorkerId), nil
 }
 
-func (m *Master) Connect() error {
+// Connect connects to the master grpc master server
+func (m *MasterClient) Connect() error {
 	address := fmt.Sprintf("%s:%d", m.masterIP, m.masterPort)
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
@@ -46,8 +50,8 @@ func (m *Master) Connect() error {
 	return nil
 }
 
-func newMaster(ip string, port int) Master {
-	return Master{
+func newMasterClient(ip string, port int) MasterClient {
+	return MasterClient{
 		masterIP:   ip,
 		masterPort: port,
 	}

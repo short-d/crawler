@@ -9,12 +9,14 @@ import (
 	"golang.org/x/net/html"
 )
 
+// Worker struct to encapsulate all the worker variables and methods
 type Worker struct {
-	id     int
-	secret string
-	master Master
+	id           int
+	secret       string
+	masterClient MasterClient
 }
 
+// ExtractLinks calls the worker method extractLinks and after informs master FinishExtractingLinks
 func (w Worker) ExtractLinks(secret string, sourceURL string) error {
 	if secret != w.secret {
 		return errors.New("incorrect credential")
@@ -25,18 +27,19 @@ func (w Worker) ExtractLinks(secret string, sourceURL string) error {
 	}
 
 	if err != nil {
-		return w.master.FinishExtractingLinks(w.id, []string{})
+		return w.masterClient.FinishExtractingLinks(w.id, []string{})
 	}
-	return w.master.FinishExtractingLinks(w.id, links)
+	return w.masterClient.FinishExtractingLinks(w.id, links)
 }
 
+// Init connects to master and register itself to the master as Idle worker.
 func (w *Worker) Init(ip string, port int) error {
-	err := w.master.Connect()
+	err := w.masterClient.Connect()
 	if err != nil {
 		return err
 	}
 
-	id, err := w.master.RegisterWorker(ip, port, w.secret)
+	id, err := w.masterClient.RegisterWorker(ip, port, w.secret)
 	if err != nil {
 		return err
 	}
@@ -82,6 +85,6 @@ func findAttr(attrs []html.Attribute, key string) (string, error) {
 	return "", errors.New("attribute not found")
 }
 
-func newWorker(master Master, secret string) Worker {
-	return Worker{master: master, secret: secret}
+func newWorker(masterClient MasterClient, secret string) Worker {
+	return Worker{masterClient: masterClient, secret: secret}
 }
