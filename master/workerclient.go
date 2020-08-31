@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Worker struct {
+type WorkerClient struct {
 	id     int
 	ip     string
 	port   int
@@ -16,7 +16,7 @@ type Worker struct {
 	client proto.WorkerClient
 }
 
-func (w *Worker) Connect() error {
+func (w *WorkerClient) Connect() error {
 	address := fmt.Sprintf("%s:%d", w.ip, w.port)
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
@@ -26,7 +26,7 @@ func (w *Worker) Connect() error {
 	return nil
 }
 
-func (w Worker) FetchLinks(ctx context.Context, source string) error {
+func (w WorkerClient) FetchLinks(ctx context.Context, source string) error {
 	req := proto.StartExtractingLinksRequest{
 		Secret: w.secret,
 		Url:    source,
@@ -35,8 +35,8 @@ func (w Worker) FetchLinks(ctx context.Context, source string) error {
 	return err
 }
 
-func newWorker(ip string, port int, secret string) Worker {
-	return Worker{
+func newWorkerClient(ip string, port int, secret string) WorkerClient {
+	return WorkerClient{
 		ip:     ip,
 		port:   port,
 		secret: secret,

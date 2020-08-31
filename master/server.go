@@ -23,13 +23,13 @@ func (s Server) ExploreWebsite(ctx context.Context, request *proto.ExploreWebsit
 }
 
 func (s Server) RegisterWorker(ctx context.Context, request *proto.RegisterWorkerRequest) (*proto.RegisterWorkerResponse, error) {
-	worker := newWorker(request.Ip, int(request.Port), request.Secret)
-	err := worker.Connect()
+	workerClient := newWorkerClient(request.Ip, int(request.Port), request.Secret)
+	err := workerClient.Connect()
 	if err != nil {
 		return nil, err
 	}
-	workerID := s.master.RegisterWorker(worker)
-	fmt.Printf("Worker registed: ID(%d) IP(%s) PORT(%d) SECRET(%s)\n", workerID, request.Ip, int(request.Port), request.Secret)
+	workerID := s.master.RegisterWorker(workerClient)
+	fmt.Printf("WorkerClient registed: ID(%d) IP(%s) PORT(%d) SECRET(%s)\n", workerID, request.Ip, int(request.Port), request.Secret)
 	return &proto.RegisterWorkerResponse{
 		WorkerId: int32(workerID),
 	}, nil
