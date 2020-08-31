@@ -4,9 +4,9 @@ import (
 	"context"
 	"crawler/proto"
 	"fmt"
-	"net"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/short-d/app/fw/service"
 	"google.golang.org/grpc"
 )
 
@@ -29,22 +29,25 @@ func (s Server) StartExtractingLinks(ctx context.Context, request *proto.StartEx
 	return &empty.Empty{}, nil
 }
 
-// Start grpc server for worker
+// Start launches grpc server for worker node
 func (s Server) Start(port int) error {
-	address := fmt.Sprintf(":%d", port)
-	lis, err := net.Listen("tcp", address)
+	gRPCService, err := service.
+		NewGRPCBuilder("Worker").
+		RegisterHandler(func(server *grpc.Server) {
+			proto.RegisterWorkerServer(server, &s)
+		}).
+		Build()
 	if err != nil {
 		return err
 	}
-	sv := grpc.NewServer()
-	proto.RegisterWorkerServer(sv, &s)
-	fmt.Printf("Worker started at %d\n", port)
 
+	fmt.Printf("Worker started at %d\n", port)
 	err = s.worker.Init("localhost", port)
 	if err != nil {
 		return err
 	}
-	return sv.Serve(lis)
+	gRPCService.StartAndWait(port)
+	return nil
 }
 
 // NewServer creates a worker server connecting to master server running the given port and IP address

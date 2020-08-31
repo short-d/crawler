@@ -5,9 +5,10 @@ import (
 	"crawler/proto"
 	"fmt"
 
-	"google.golang.org/grpc"
+	"github.com/short-d/app/fw/rpc"
 )
 
+// Worker encapsulates grpc api for worker server
 type Worker struct {
 	id     int
 	ip     string
@@ -16,16 +17,20 @@ type Worker struct {
 	client proto.WorkerClient
 }
 
+// Connect to worker server running on paticular ip and port
 func (w *Worker) Connect() error {
-	address := fmt.Sprintf("%s:%d", w.ip, w.port)
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := rpc.
+		NewClientConnBuilder(w.ip, w.port).
+		Build()
 	if err != nil {
 		return err
 	}
+
 	w.client = proto.NewWorkerClient(conn)
 	return nil
 }
 
+// FetchLinks starts fetching a link asynchronously 
 func (w Worker) FetchLinks(ctx context.Context, source string) error {
 	req := proto.StartExtractingLinksRequest{
 		Secret: w.secret,
