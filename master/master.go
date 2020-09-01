@@ -7,9 +7,9 @@ import (
 )
 
 type Master struct {
-	workerClients     []WorkerClient
-	idleWorkerClients chan WorkerClient
-	linksCh           chan []string
+	workers     []WorkerClient
+	idleWorkers chan WorkerClient
+	linksCh     chan []string
 }
 
 func (m *Master) ExploreWebsite(ctx context.Context, siteURL string) {
@@ -46,11 +46,11 @@ func (m *Master) ExploreWebsite(ctx context.Context, siteURL string) {
 			}
 		case link := <-linkCh:
 			go func(link string) {
-				// process the current site there is idle workerClients
-				worker := <-m.idleWorkerClients
+				// process the current site there is idle workers
+				worker := <-m.idleWorkers
 				err := worker.FetchLinks(ctx, link)
 				if err != nil {
-					m.idleWorkerClients <- worker
+					m.idleWorkers <- worker
 				}
 			}(link)
 		case <-done:
@@ -62,21 +62,21 @@ func (m *Master) ExploreWebsite(ctx context.Context, siteURL string) {
 func (m *Master) FinishExtractingLinks(workerID int, links []string) {
 	m.linksCh <- links
 	go func() {
-		m.idleWorkerClients <- m.workerClients[workerID]
+		m.idleWorkers <- m.workers[workerID]
 	}()
 }
 
-func (m *Master) RegisterWorker(workerClient WorkerClient) int {
-	workID := len(m.workerClients)
-	m.workerClients = append(m.workerClients, workerClient)
+func (m *Master) RegisterWorker(worker WorkerClient) int {
+	workID := len(m.workers)
+	m.workers = append(m.workers, worker)
 	go func() {
-		m.idleWorkerClients <- workerClient
+		m.idleWorkers <- worker
 	}()
 	return workID
 }
 
 func newMaster() *Master {
 	return &Master{
-		idleWorkerClients: make(chan WorkerClient),
+		idleWorkers: make(chan WorkerClient),
 	}
 }
