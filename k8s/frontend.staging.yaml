@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: staging
+  name: sampleapp-web
+  labels:
+    app: sampleapp
+    tier: frontend
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  revisionHistoryLimit: 3
+  template:
+    metadata:
+      name: sampleapp-web
+      labels:
+        app: sampleapp
+        tier: frontend
+    spec:
+      containers:
+        - name: sampleapp-web
+          image: shortorg/sampleapp-web-staging
+          imagePullPolicy: Always
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: sampleapp
+      tier: frontend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: staging
+  name: sampleapp-web
+spec:
+  selector:
+    app: sampleapp
+    tier: frontend
+  ports:
+    - port: 80
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  namespace: staging
+  name: sampleapp-web
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/frontend-entry-points: http,https
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+spec:
+  tls:
+    - hosts:
+        - sampleapp-staging.short-d.com
+      secretName: short-d.com-tls
+  rules:
+    - host: sampleapp-staging.short-d.com
+      http:
+        paths:
+          - backend:
+              serviceName: sampleapp-web
+              servicePort: 80
